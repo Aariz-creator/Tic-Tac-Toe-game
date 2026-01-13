@@ -85,3 +85,18 @@ Responsive grid layout
 Winning combination highlighted in green
 
 Smooth and minimal interface
+
+## 🤖 AI Mode
+
+- Play against an **unbeatable AI**
+- AI uses the **Minimax algorithm**
+- Automatic turn switching
+- Visual delay for realistic gameplay
+
+## ✨ Animations
+
+- Smooth hover effects
+- Pop animation on moves
+- Glowing winning cells
+- Responsive button interactions
+
