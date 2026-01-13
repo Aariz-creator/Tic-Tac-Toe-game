@@ -2,115 +2,111 @@ const boxes = document.querySelectorAll(".box");
 const gameInfo = document.querySelector(".game-info");
 const newGameBtn = document.querySelector(".btn");
 
-
+let board;
 let currentPlayer;
-let gameGrid;
 
-const winningPositions = [
-    [0,1,2],
-    [3,4,5],
-    [6,7,8],
-    [0,3,6],
-    [1,4,7],
-    [2,5,8],
-    [0,4,8],
-    [2,4,6]
+const HUMAN = "X";
+const AI = "O";
+
+const winningCombos = [
+  [0,1,2],[3,4,5],[6,7,8],
+  [0,3,6],[1,4,7],[2,5,8],
+  [0,4,8],[2,4,6]
 ];
-
-//let's create a function to initialise the game
-function initGame() {
-    currentPlayer = "X";
-    gameGrid = ["","","","","","","","",""];
-    //UI pr empty bhi karna padega boxes ko
-    boxes.forEach((box, index) => {
-        box.innerText = "";
-        boxes[index].style.pointerEvents = "all";
-        //one more thing is missing, initialise box with css properties again
-        box.classList = `box box${index+1}`;
-    });
-    newGameBtn.classList.remove("active");
-    gameInfo.innerText = `Current Player - ${currentPlayer}`;
-}
 
 initGame();
 
-function swapTurn() {
-    if(currentPlayer === "X") {
-        currentPlayer = "O";
-    }
-    else {
-        currentPlayer = "X";
-    }
-    //UI Update
-    gameInfo.innerText = `Current Player - ${currentPlayer}`;
+function initGame() {
+  board = Array(9).fill("");
+  currentPlayer = HUMAN;
+  gameInfo.textContent = "Your Turn (X)";
+  newGameBtn.classList.remove("active");
+
+  boxes.forEach((box, i) => {
+    box.textContent = "";
+    box.className = `box box${i + 1}`;
+    box.style.pointerEvents = "all";
+    box.addEventListener("click", () => handleHumanMove(i), { once: true });
+  });
 }
 
-function checkGameOver() {
-    let answer = "";
+function handleHumanMove(index) {
+  if (board[index] !== "") return;
 
-    winningPositions.forEach((position) => {
-        //all 3 boxes should be non-empty and exactly same in value
-        if( (gameGrid[position[0]] !== "" || gameGrid[position[1]] !== "" || gameGrid[position[2]] !== "") 
-            && (gameGrid[position[0]] === gameGrid[position[1]] ) && (gameGrid[position[1]] === gameGrid[position[2]])) {
+  makeMove(index, HUMAN);
+  if (checkWinner(board, HUMAN) || isTie()) return;
 
-                //check if winner is X
-                if(gameGrid[position[0]] === "X") 
-                    answer = "X";
-                else {
-                    answer = "O";
-                } 
-                    
-
-                //disable pointer events
-                boxes.forEach((box) => {
-                    box.style.pointerEvents = "none";
-                })
-
-                //now we know X/O is a winner
-                boxes[position[0]].classList.add("win");
-                boxes[position[1]].classList.add("win");
-                boxes[position[2]].classList.add("win");
-            }
-    });
-
-    //it means we have a winner
-    if(answer !== "" ) {
-        gameInfo.innerText = `Winner Player - ${answer}`;
-        newGameBtn.classList.add("active");
-        return;
-    }
-
-    //We know, NO Winner Found, let's check whether there is tie
-    let fillCount = 0;
-    gameGrid.forEach((box) => {
-        if(box !== "" )
-            fillCount++;
-    });
-
-    //board is Filled, game is TIE
-    if(fillCount === 9) {
-        gameInfo.innerText = "Game Tied !";
-        newGameBtn.classList.add("active");
-    }
-
+  gameInfo.textContent = "AI Thinking...";
+  setTimeout(() => {
+    const bestMove = minimax(board, AI).index;
+    makeMove(bestMove, AI);
+    if (!checkWinner(board, AI)) isTie();
+  }, 400);
 }
 
-function handleClick(index) {
-    if(gameGrid[index] === "" ) {
-        boxes[index].innerText = currentPlayer;
-        gameGrid[index] = currentPlayer;
-        boxes[index].style.pointerEvents = "none";
-        //swap karo turn ko
-        swapTurn();
-        //check koi jeet toh nahi gya
-        checkGameOver();
-    }
+function makeMove(index, player) {
+  board[index] = player;
+  boxes[index].textContent = player;
+  boxes[index].classList.add("pop");
 }
 
-boxes.forEach((box, index) => {
-    box.addEventListener("click", () => {
-        handleClick(index);
-    })
-});
+function checkWinner(bd, player) {
+  for (let combo of winningCombos) {
+    if (combo.every(i => bd[i] === player)) {
+      combo.forEach(i => boxes[i].classList.add("win"));
+      endGame(player === HUMAN ? "You Win 🎉" : "AI Wins 🤖");
+      return true;
+    }
+  }
+  return false;
+}
+
+function isTie() {
+  if (board.every(cell => cell !== "")) {
+    endGame("It's a Tie 🤝");
+    return true;
+  }
+  return false;
+}
+
+function endGame(message) {
+  gameInfo.textContent = message;
+  newGameBtn.classList.add("active");
+  boxes.forEach(box => box.style.pointerEvents = "none");
+}
+
+/* ---------- MINIMAX ---------- */
+function minimax(newBoard, player) {
+  const emptySpots = newBoard
+    .map((v, i) => v === "" ? i : null)
+    .filter(v => v !== null);
+
+  if (checkWinSim(newBoard, HUMAN)) return { score: -10 };
+  if (checkWinSim(newBoard, AI)) return { score: 10 };
+  if (emptySpots.length === 0) return { score: 0 };
+
+  let moves = [];
+
+  for (let i of emptySpots) {
+    let move = {};
+    move.index = i;
+    newBoard[i] = player;
+
+    move.score = player === AI
+      ? minimax(newBoard, HUMAN).score
+      : minimax(newBoard, AI).score;
+
+    newBoard[i] = "";
+    moves.push(move);
+  }
+
+  return player === AI
+    ? moves.reduce((best, m) => m.score > best.score ? m : best)
+    : moves.reduce((best, m) => m.score < best.score ? m : best);
+}
+
+function checkWinSim(board, player) {
+  return winningCombos.some(c => c.every(i => board[i] === player));
+}
 
 newGameBtn.addEventListener("click", initGame);

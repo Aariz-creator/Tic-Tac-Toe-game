@@ -87,4 +87,38 @@
 
 .win{
     background-color: rgba(0, 255, 0, 0.3);
+}/* Smooth transitions */
+.box {
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.box:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.pop {
+  animation: pop 0.25s ease;
+}
+
+@keyframes pop {
+  0% { transform: scale(0.6); }
+  100% { transform: scale(1); }
+}
+
+.win {
+  background-color: rgba(0, 255, 0, 0.4);
+  animation: glow 1s infinite alternate;
+}
+
+@keyframes glow {
+  from { box-shadow: 0 0 5px #00ff00; }
+  to { box-shadow: 0 0 20px #00ff00; }
+}
+
+.btn {
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.btn:hover {
+  transform: scale(1.1);
 }
