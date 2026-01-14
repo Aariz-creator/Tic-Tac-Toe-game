@@ -100,3 +100,6 @@ Smooth and minimal interface
 - Glowing winning cells
 - Responsive button interactions
 
+  
+
+
