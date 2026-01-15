@@ -39,11 +39,7 @@ initGame();
 function initGame() {
   board = Array(9).fill("");
   currentPlayer = HUMAN;
-<<<<<<< HEAD
-  gameInfo.textContent = `Your Turn  {playerName}`;
-=======
-  gameInfo.textContent = `Your Turn`;
->>>>>>> c64209d176c4b716a6615a422d925d2295b49e71
+  gameInfo.textContent = `Your Turn `;
   newGameBtn.classList.remove("active");
 
   boxes.forEach((box, i) => {
@@ -63,7 +59,7 @@ function handleHumanMove(index) {
   gameInfo.textContent = "AI is thinking";
   setTimeout(() => {
     
-  gameInfo.textContent = `c'mon ${playerName}, make the move`;
+  gameInfo.textContent = `c'mon ${playerName} ,make the move`;
     const bestMove = minimax(board, AI).index;
     makeMove(bestMove, AI);
     if (!checkWinner(board, AI)) isTie();
