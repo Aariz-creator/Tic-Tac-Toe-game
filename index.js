@@ -39,7 +39,11 @@ initGame();
 function initGame() {
   board = Array(9).fill("");
   currentPlayer = HUMAN;
+<<<<<<< HEAD
   gameInfo.textContent = `Your Turn  {playerName}`;
+=======
+  gameInfo.textContent = `Your Turn`;
+>>>>>>> c64209d176c4b716a6615a422d925d2295b49e71
   newGameBtn.classList.remove("active");
 
   boxes.forEach((box, i) => {
