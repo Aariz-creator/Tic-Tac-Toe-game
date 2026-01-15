@@ -1,6 +1,13 @@
 const boxes = document.querySelectorAll(".box");
 const gameInfo = document.querySelector(".game-info");
 const newGameBtn = document.querySelector(".btn");
+const page1=document.querySelector(".page1");
+const page2=document.querySelector(".page2");
+const startBtn=document.querySelector(".start-btn");
+const playerInput=document.querySelector(".player-input");
+
+
+
 
 let board;
 let currentPlayer;
@@ -14,12 +21,25 @@ const winningCombos = [
   [0,4,8],[2,4,6]
 ];
 
+startBtn.addEventListener("click", () => {
+  if (playerInput.value.trim() === "") {
+    alert("Please enter your name");
+    return;
+  }
+
+  playerName = playerInput.value.trim();
+
+  page1.classList.remove("active");
+  page2.classList.add("active");
+
+});
+
 initGame();
 
 function initGame() {
   board = Array(9).fill("");
   currentPlayer = HUMAN;
-  gameInfo.textContent = "Your Turn (X)";
+  gameInfo.textContent = `Your Turn  {playerName}`;
   newGameBtn.classList.remove("active");
 
   boxes.forEach((box, i) => {
@@ -36,8 +56,10 @@ function handleHumanMove(index) {
   makeMove(index, HUMAN);
   if (checkWinner(board, HUMAN) || isTie()) return;
 
-  gameInfo.textContent = "AI Thinking...";
+  gameInfo.textContent = "AI is thinking";
   setTimeout(() => {
+    
+  gameInfo.textContent = `c'mon ${playerName}, make the move`;
     const bestMove = minimax(board, AI).index;
     makeMove(bestMove, AI);
     if (!checkWinner(board, AI)) isTie();
